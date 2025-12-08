@@ -16,7 +16,7 @@ A Python library for launching Progressive Web Apps (PWAs) using Chromium-based 
 ## Installation
 
 ```bash
-pip install py-pwa-launcher
+pip install pwa-launcher
 ```
 
 ## Quick Start

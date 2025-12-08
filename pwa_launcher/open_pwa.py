@@ -145,12 +145,38 @@ def open_pwa(
     
     # Launch the browser
     try:
-        process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+        # On Linux/macOS, we need to allow the process to run independently
+        # Don't capture stdout/stderr to avoid blocking issues
+        import platform
+        
+        if platform.system() in ('Linux', 'Darwin'):
+            # Use DEVNULL to detach from parent process I/O
+            process = subprocess.Popen(
+                cmd,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True  # Detach from parent session on Unix
+            )
+        else:
+            # Windows - keep original behavior
+            process = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+        
         logger.debug("Browser launched with PID: %s", process.pid)
+        
+        # On Linux, give the process a moment to start and check if it failed immediately
+        if platform.system() == 'Linux':
+            import time
+            time.sleep(0.5)
+            poll_result = process.poll()
+            if poll_result is not None:
+                logger.error("Browser process exited immediately with code: %s", poll_result)
+                logger.error("This may indicate missing dependencies on Linux.")
+                logger.error("Try running: sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2")
+                raise RuntimeError(f"Chrome failed to start on Linux (exit code: {poll_result}). Missing dependencies? See log for installation command.")
         
         # Wait for process if requested
         if wait:

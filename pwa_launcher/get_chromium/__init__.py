@@ -1,13 +1,11 @@
 """
 Get Chromium - Find or install Chromium-based browsers.
-
-Main entry point for getting a Chromium browser executable.
 """
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
-from pwa_launcher.get_chromium.find_chromium import find_system_chromium, find_chrome, find_edge, get_chromium_info
+from pwa_launcher.get_chromium.find_chromium import find_system_chromium, find_system_chromiums
 from pwa_launcher.get_chromium.install_chromium import find_existing_chromium, install_chromium
 
 
@@ -16,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 class ChromiumNotFoundError(Exception):
     """Raised when no Chromium browser is found and installation is disallowed."""
-    pass
 
 
 def get_chromium_install(
@@ -34,38 +31,26 @@ def get_chromium_install(
     3. Download new portable Chrome (if allow_download=True)
     
     Args:
-        allow_system: If True, search for system-installed Chrome/Edge first
-        allow_download: If True, allow downloading portable Chrome if not found
-        install_dir: Optional directory for portable Chrome installation
-        force_reinstall: If True, force download even if portable Chrome exists
+        allow_system: Search for system-installed Chrome/Edge first
+        allow_download: Allow downloading portable Chrome if not found
+        install_dir: Directory for portable Chrome installation
+        force_reinstall: Force download even if portable Chrome exists
         
     Returns:
         Path to Chromium executable
         
     Raises:
-        ChromiumNotFoundError: If no Chromium found and installation is disallowed
-        
-    Examples:
-        >>> # Default - try everything
-        >>> chrome = get_chromium_install()
-        
-        >>> # Only use system browser, don't download
-        >>> chrome = get_chromium_install(allow_download=False)
-        
-        >>> # Only download, don't use system browser
-        >>> chrome = get_chromium_install(allow_system=False)
-        
-        >>> # Force fresh download
-        >>> chrome = get_chromium_install(force_reinstall=True)
+        ChromiumNotFoundError: No Chromium found and installation is disallowed
     """
     # Step 1: Try system-installed browsers
     if allow_system:
         logger.debug("Searching for system-installed Chromium browsers...")
-        system_chrome = find_system_chromium()
-        if system_chrome:
+        try:
+            system_chrome = find_system_chromium()
             logger.info("Using system-installed browser: %s", system_chrome)
             return system_chrome
-        logger.debug("No system browser found")
+        except FileNotFoundError:
+            logger.debug("No system browser found")
     
     # Step 2: Check if portable Chrome was already downloaded
     if allow_download and not force_reinstall:
@@ -101,14 +86,42 @@ def get_chromium_install(
     )
 
 
-# Re-export useful functions
+def get_chromium_installs(
+    allow_system: bool = True,
+    allow_download: bool = False,
+    install_dir: Optional[Path] = None,
+) -> List[Path]:
+    """
+    Get all found Chromium browser executable paths.
+    
+    Args:
+        allow_system: Include system-installed Chrome/Edge
+        allow_download: Include downloaded portable Chrome
+        install_dir: Directory for portable Chrome installation
+        
+    Returns:
+        List of Paths to Chromium executables (may be empty)
+    """
+    found = []
+    
+    # Get system browsers
+    if allow_system:
+        logger.debug("Searching for system-installed Chromium browsers...")
+        found.extend(find_system_chromiums())
+    
+    # Get portable Chrome
+    if allow_download:
+        logger.debug("Checking for portable Chromium installation...")
+        existing_chrome = find_existing_chromium(install_dir)
+        if existing_chrome:
+            found.append(existing_chrome)
+    
+    logger.info("Found %d Chromium browser(s)", len(found))
+    return found
+
+
 __all__ = [
     "get_chromium_install",
+    "get_chromium_installs",
     "ChromiumNotFoundError",
-    "find_system_chromium",
-    "find_chrome",
-    "find_edge",
-    "get_chromium_info",
-    "find_existing_chromium",
-    "install_chromium",
 ]

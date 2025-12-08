@@ -146,17 +146,55 @@ def open_pwa(
     # Launch the browser
     try:
         # On Linux/macOS, we need to allow the process to run independently
-        # Don't capture stdout/stderr to avoid blocking issues
         import platform
         
         if platform.system() in ('Linux', 'Darwin'):
-            # Use DEVNULL to detach from parent process I/O
-            process = subprocess.Popen(
-                cmd,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                start_new_session=True  # Detach from parent session on Unix
-            )
+            # On Linux, temporarily capture stderr to check for dependency errors
+            if platform.system() == 'Linux':
+                process = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.PIPE,
+                    start_new_session=True
+                )
+                
+                # Give it a moment to start
+                import time
+                time.sleep(0.5)
+                poll_result = process.poll()
+                
+                if poll_result is not None:
+                    # Process failed - read stderr to see why
+                    stderr_output = process.stderr.read().decode('utf-8', errors='ignore')
+                    
+                    logger.error("Chrome failed to start on Linux (exit code: %s)", poll_result)
+                    if stderr_output:
+                        logger.error("Chrome error output:\n%s", stderr_output)
+                    
+                    # Check for common dependency errors
+                    if 'error while loading shared libraries' in stderr_output.lower():
+                        logger.error("\n=== MISSING DEPENDENCIES ===")
+                        logger.error("Chrome requires system libraries that are not installed.")
+                        logger.error("Run this command to install them:")
+                        logger.error("sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2")
+                        raise RuntimeError(
+                            "Chrome failed to start due to missing system libraries. "
+                            "Install dependencies with: sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2"
+                        )
+                    else:
+                        raise RuntimeError(f"Chrome failed to start on Linux (exit code: {poll_result}). Check logs for details.")
+                
+                # Process started successfully - now detach stderr
+                # Close the pipe since we don't need it anymore
+                process.stderr.close()
+            else:
+                # macOS - just detach completely
+                process = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    start_new_session=True
+                )
         else:
             # Windows - keep original behavior
             process = subprocess.Popen(
@@ -166,17 +204,6 @@ def open_pwa(
             )
         
         logger.debug("Browser launched with PID: %s", process.pid)
-        
-        # On Linux, give the process a moment to start and check if it failed immediately
-        if platform.system() == 'Linux':
-            import time
-            time.sleep(0.5)
-            poll_result = process.poll()
-            if poll_result is not None:
-                logger.error("Browser process exited immediately with code: %s", poll_result)
-                logger.error("This may indicate missing dependencies on Linux.")
-                logger.error("Try running: sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2")
-                raise RuntimeError(f"Chrome failed to start on Linux (exit code: {poll_result}). Missing dependencies? See log for installation command.")
         
         # Wait for process if requested
         if wait:

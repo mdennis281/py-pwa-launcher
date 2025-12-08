@@ -1,4 +1,7 @@
 # py-pwa-launcher
+
+## Note: still WIP, working through cross platform support
+
 Launch Progressive Web Apps from Python
 
 A Python library for launching Progressive Web Apps (PWAs) using Chromium-based browsers. Automatically finds or downloads a Chromium browser and launches PWAs in app mode with all necessary flags.

@@ -110,6 +110,15 @@ def open_pwa(
         '--disable-infobars',
     ]
     
+    # Add Linux-specific flags
+    import platform
+    if platform.system() == 'Linux':
+        pwa_flags.extend([
+            '--no-sandbox',  # Required for running in restricted environments
+            '--disable-gpu',  # Disable GPU hardware acceleration (can cause issues)
+            '--disable-dev-shm-usage',  # Overcome limited resource problems
+        ])
+    
     cmd.extend(pwa_flags)
     
     # Auto-generate isolated profile if requested and user_data_dir not provided

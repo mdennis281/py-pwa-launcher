@@ -66,7 +66,7 @@ def open_pwa(
     if not url.startswith(('http://', 'https://')):
         url = f'https://{url}'
     
-    logger.info("Launching PWA for URL: %s", url)
+    logger.debug("Launching PWA for URL: %s", url)
     
     # Get Chromium executable if not provided
     if chromium_path is None:
@@ -77,7 +77,7 @@ def open_pwa(
             install_dir=install_dir,
         )
     
-    logger.info("Using Chromium at: %s", chromium_path)
+    logger.info("Using Chromium: %s", chromium_path)
     
     # Build command line arguments
     cmd = [str(chromium_path)]
@@ -105,6 +105,9 @@ def open_pwa(
         
         # Disable first run experience
         '--no-first-run',
+        
+        # Disable automation/testing banners
+        '--disable-infobars',
     ]
     
     cmd.extend(pwa_flags)
@@ -147,13 +150,13 @@ def open_pwa(
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        logger.info("Browser launched with PID: %s", process.pid)
+        logger.debug("Browser launched with PID: %s", process.pid)
         
         # Wait for process if requested
         if wait:
             logger.debug("Waiting for browser process to exit...")
             process.wait()
-            logger.info("Browser process exited with code: %s", process.returncode)
+            logger.debug("Browser process exited with code: %s", process.returncode)
         
         return process
         

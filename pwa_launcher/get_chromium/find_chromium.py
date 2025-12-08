@@ -86,7 +86,7 @@ def find_system_chromium() -> Path:
     
     for path in _get_chromium_paths():
         if path.exists() and path.is_file():
-            logger.info("Found Chromium at: %s", path)
+            logger.debug("Found Chromium at: %s", path)
             return path
     
     logger.error("No Chromium-based browser found on system")
@@ -108,5 +108,5 @@ def find_system_chromiums() -> List[Path]:
             found.append(path)
             logger.debug("Found: %s", path)
     
-    logger.info("Found %d Chromium browser(s)", len(found))
+    logger.debug("Found %d Chromium browser(s)", len(found))
     return found

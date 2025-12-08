@@ -47,7 +47,7 @@ def get_chromium_install(
         logger.debug("Searching for system-installed Chromium browsers...")
         try:
             system_chrome = find_system_chromium()
-            logger.info("Using system-installed browser: %s", system_chrome)
+            logger.debug("Found system-installed browser: %s", system_chrome)
             return system_chrome
         except FileNotFoundError:
             logger.debug("No system browser found")
@@ -57,20 +57,20 @@ def get_chromium_install(
         logger.debug("Checking for existing portable Chromium installation...")
         existing_chrome = find_existing_chromium(install_dir)
         if existing_chrome:
-            logger.info("Using existing portable Chromium: %s", existing_chrome)
+            logger.debug("Found existing portable Chromium: %s", existing_chrome)
             return existing_chrome
         logger.debug("No existing portable installation found")
     
     # Step 3: Download portable Chrome
     if allow_download:
-        logger.info("Downloading portable Chromium...")
+        logger.debug("Downloading portable Chromium...")
         try:
             chrome_path = install_chromium(
                 install_dir=install_dir,
                 clean_existing=False,
                 force_reinstall=force_reinstall
             )
-            logger.info("Using downloaded portable Chromium: %s", chrome_path)
+            logger.debug("Downloaded portable Chromium: %s", chrome_path)
             return chrome_path
         except Exception as e:
             logger.error("Failed to download Chromium: %s", e)
@@ -116,7 +116,7 @@ def get_chromium_installs(
         if existing_chrome:
             found.append(existing_chrome)
     
-    logger.info("Found %d Chromium browser(s)", len(found))
+    logger.debug("Found %d Chromium browser(s)", len(found))
     return found
 
 

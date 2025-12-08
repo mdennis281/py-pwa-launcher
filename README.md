@@ -64,6 +64,23 @@ process = open_pwa(
 print(f"Launched PWA (PID: {process.pid})")
 ```
 
+### Keep Process Alive
+
+By default, each PWA runs in an **isolated profile** to keep the process alive:
+
+```python
+from pwa_launcher import open_pwa
+
+# Auto-generates isolated profile - process stays alive!
+process = open_pwa("https://example.com")
+print(f"PID: {process.pid}")  # Process won't exit immediately
+
+# To disable auto-profile (may cause process to exit if Chrome is already running):
+process = open_pwa("https://example.com", auto_profile=False)
+```
+
+**Why this matters:** When Chrome reuses an existing profile, it hands off to an already-running Chrome instance and the new process exits immediately. With `auto_profile=True` (default), each PWA gets its own isolated profile, keeping the process running.
+
 ## API Reference
 
 ### `open_pwa(url, **kwargs)`
@@ -79,12 +96,15 @@ Launch a PWA using Chromium browser.
 - `user_data_dir` (Path, optional): Custom browser profile directory
 - `additional_flags` (List[str], optional): Extra Chromium flags
 - `wait` (bool, default=False): Wait for browser to exit
+- `auto_profile` (bool, default=True): Auto-generate isolated profile (keeps process alive)
 
 **Returns:** `subprocess.Popen` - Browser process
 
 **Raises:**
 - `ChromiumNotFoundError`: No browser found
 - `ValueError`: Invalid URL
+
+**Note:** When `auto_profile=True`, each PWA gets its own isolated profile based on the URL hostname. This prevents Chrome from handing off to an existing instance and keeps your process alive.
 
 ### `check_pwa_support(url, timeout=10)`
 

@@ -187,3 +187,53 @@ class TestOpenPWA:
                 # Check that allow_download was passed
                 mock_get.assert_called_once()
                 assert mock_get.call_args[1]['allow_download'] is False
+    
+    def test_auto_profile_enabled(self):
+        """Test that auto_profile generates isolated profile directory."""
+        mock_chrome = Path("/usr/bin/chrome")
+        
+        with patch('pwa_launcher.open_pwa.get_chromium_install', return_value=mock_chrome):
+            with patch('subprocess.Popen') as mock_popen:
+                with patch('pathlib.Path.mkdir'):
+                    mock_process = Mock()
+                    mock_popen.return_value = mock_process
+                    
+                    open_pwa("https://example.com", auto_profile=True)
+                    
+                    # Check that a user-data-dir was auto-generated
+                    call_args = mock_popen.call_args[0][0]
+                    assert any('--user-data-dir=' in arg for arg in call_args)
+                    assert any('pwa_example_com' in arg for arg in call_args)
+    
+    def test_auto_profile_disabled(self):
+        """Test that auto_profile=False doesn't add user-data-dir."""
+        mock_chrome = Path("/usr/bin/chrome")
+        
+        with patch('pwa_launcher.open_pwa.get_chromium_install', return_value=mock_chrome):
+            with patch('subprocess.Popen') as mock_popen:
+                mock_process = Mock()
+                mock_popen.return_value = mock_process
+                
+                open_pwa("https://example.com", auto_profile=False)
+                
+                # Check that no user-data-dir flag is present
+                call_args = mock_popen.call_args[0][0]
+                assert not any('--user-data-dir=' in arg for arg in call_args)
+    
+    def test_custom_user_data_dir_overrides_auto_profile(self):
+        """Test that explicit user_data_dir overrides auto_profile."""
+        mock_chrome = Path("/usr/bin/chrome")
+        custom_dir = Path("/custom/profile")
+        
+        with patch('pwa_launcher.open_pwa.get_chromium_install', return_value=mock_chrome):
+            with patch('subprocess.Popen') as mock_popen:
+                with patch('pathlib.Path.mkdir'):
+                    mock_process = Mock()
+                    mock_popen.return_value = mock_process
+                    
+                    open_pwa("https://example.com", user_data_dir=custom_dir, auto_profile=True)
+                    
+                    # Check that custom dir is used, not auto-generated one
+                    call_args = mock_popen.call_args[0][0]
+                    assert any(f'--user-data-dir={custom_dir}' in arg for arg in call_args)
+                    assert not any('pwa_example_com' in arg for arg in call_args)

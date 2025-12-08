@@ -1,10 +1,13 @@
 """
 Open PWA - Launch a Progressive Web App using Chromium.
 """
+import hashlib
 import logging
+import tempfile
 import subprocess
 from pathlib import Path
 from typing import Optional, List
+from urllib.parse import urlparse
 
 from pwa_launcher.get_chromium import get_chromium_install, ChromiumNotFoundError
 
@@ -21,6 +24,7 @@ def open_pwa(
     user_data_dir: Optional[Path] = None,
     additional_flags: Optional[List[str]] = None,
     wait: bool = False,
+    auto_profile: bool = True,
 ) -> subprocess.Popen:
     """
     Open a URL as a Progressive Web App using Chromium.
@@ -37,6 +41,7 @@ def open_pwa(
         user_data_dir: Custom user data directory for browser profile
         additional_flags: Additional Chromium flags
         wait: Wait for the browser process to exit
+        auto_profile: Auto-generate isolated profile for the PWA (keeps process alive)
         
     Returns:
         subprocess.Popen object representing the browser process
@@ -44,6 +49,12 @@ def open_pwa(
     Raises:
         ChromiumNotFoundError: No Chromium browser found
         ValueError: Invalid or empty URL
+        
+    Note:
+        When auto_profile=True (default), each PWA gets its own isolated profile
+        based on the URL hostname. This keeps the browser process alive and prevents
+        Chrome from handing off to an existing instance. If you need a shared profile,
+        set auto_profile=False or provide a custom user_data_dir.
     """
     # Validate URL
     if not url or not url.strip():
@@ -98,7 +109,23 @@ def open_pwa(
     
     cmd.extend(pwa_flags)
     
-    # Add custom user data directory if provided
+    # Auto-generate isolated profile if requested and user_data_dir not provided
+    if auto_profile and user_data_dir is None:
+        # Create a profile directory based on the URL hostname
+        # This ensures each PWA runs in its own process
+        parsed = urlparse(url)
+        hostname = parsed.hostname or parsed.path.split('/')[0]
+        
+        # Use a hash to handle special characters and long hostnames
+        hostname_hash = hashlib.md5(hostname.encode()).hexdigest()[:8]
+        profile_name = f"pwa_{hostname.replace('.', '_')}_{hostname_hash}"
+        
+        temp_base = Path(tempfile.gettempdir()) / "py-pwa-launcher"
+        user_data_dir = temp_base / profile_name
+        
+        logger.debug("Auto-generated profile directory for %s: %s", hostname, user_data_dir)
+    
+    # Add custom user data directory if provided or auto-generated
     if user_data_dir:
         user_data_dir = Path(user_data_dir)
         user_data_dir.mkdir(parents=True, exist_ok=True)

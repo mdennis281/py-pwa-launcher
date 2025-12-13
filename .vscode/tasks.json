@@ -10,7 +10,7 @@
                 "pylint",
                 "--score=yes",
                 "scripts/",
-                "lanscape/",
+                "pwa_launcher/",
                 "tests/"
             ],
             "problemMatcher": [],
@@ -173,7 +173,7 @@
                 "-n",
                 "auto",
                 "--dist=loadscope",
-                "--cov=lanscape",
+                "--cov=pwa_launcher",
                 "--cov-report=html",
                 "--cov-report=term-missing",
                 "-v"

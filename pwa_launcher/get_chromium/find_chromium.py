@@ -40,6 +40,43 @@ def _get_chromium_paths() -> List[Path]:
             "Edge" / "Application" / "msedge.exe",
         ])
 
+        # Chromium paths
+        paths.extend([
+            Path(program_files) / "Chromium" /
+            "Application" / "chrome.exe",
+            Path(program_files_x86) / "Chromium" /
+            "Application" / "chrome.exe",
+            Path(local_appdata) / "Chromium" /
+            "Application" / "chrome.exe",
+        ])
+
+        # Brave paths
+        paths.extend([
+            Path(program_files) / "BraveSoftware" /
+            "Brave-Browser" / "Application" / "brave.exe",
+            Path(program_files_x86) / "BraveSoftware" /
+            "Brave-Browser" / "Application" / "brave.exe",
+            Path(local_appdata) / "BraveSoftware" /
+            "Brave-Browser" / "Application" / "brave.exe",
+        ])
+
+        # Vivaldi paths
+        paths.extend([
+            Path(program_files) / "Vivaldi" /
+            "Application" / "vivaldi.exe",
+            Path(program_files_x86) / "Vivaldi" /
+            "Application" / "vivaldi.exe",
+            Path(local_appdata) / "Vivaldi" /
+            "Application" / "vivaldi.exe",
+        ])
+
+        # Opera paths
+        paths.extend([
+            Path(program_files) / "Opera" / "opera.exe",
+            Path(program_files_x86) / "Opera" / "opera.exe",
+            Path(local_appdata) / "Programs" / "Opera" / "opera.exe",
+        ])
+
     elif system == "Darwin":  # macOS
         # Chrome paths
         paths.extend([
@@ -53,6 +90,41 @@ def _get_chromium_paths() -> List[Path]:
             Path("/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"),
             Path.home() / "Applications" / "Microsoft Edge.app" /
             "Contents" / "MacOS" / "Microsoft Edge",
+        ])
+
+        # Chromium paths
+        paths.extend([
+            Path("/Applications/Chromium.app/Contents/MacOS/Chromium"),
+            Path.home() / "Applications" /
+            "Chromium.app" / "Contents" / "MacOS" / "Chromium",
+        ])
+
+        # Brave paths
+        paths.extend([
+            Path("/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"),
+            Path.home() / "Applications" / "Brave Browser.app" /
+            "Contents" / "MacOS" / "Brave Browser",
+        ])
+
+        # Vivaldi paths
+        paths.extend([
+            Path("/Applications/Vivaldi.app/Contents/MacOS/Vivaldi"),
+            Path.home() / "Applications" /
+            "Vivaldi.app" / "Contents" / "MacOS" / "Vivaldi",
+        ])
+
+        # Opera paths
+        paths.extend([
+            Path("/Applications/Opera.app/Contents/MacOS/Opera"),
+            Path.home() / "Applications" /
+            "Opera.app" / "Contents" / "MacOS" / "Opera",
+        ])
+
+        # Arc paths
+        paths.extend([
+            Path("/Applications/Arc.app/Contents/MacOS/Arc"),
+            Path.home() / "Applications" /
+            "Arc.app" / "Contents" / "MacOS" / "Arc",
         ])
 
     elif system == "Linux":
@@ -75,6 +147,41 @@ def _get_chromium_paths() -> List[Path]:
             Path("/usr/bin/microsoft-edge-dev"),
             Path("/opt/microsoft/msedge/msedge"),
             Path("/snap/bin/microsoft-edge"),
+        ])
+
+        # Chromium paths
+        paths.extend([
+            Path("/usr/bin/chromium"),
+            Path("/usr/bin/chromium-browser"),
+            Path("/usr/local/bin/chromium"),
+            Path("/usr/local/bin/chromium-browser"),
+            Path("/snap/bin/chromium"),
+            Path("/var/lib/snapd/snap/bin/chromium"),
+        ])
+
+        # Brave paths
+        paths.extend([
+            Path("/usr/bin/brave-browser"),
+            Path("/usr/bin/brave"),
+            Path("/snap/bin/brave"),
+            Path("/var/lib/flatpak/exports/bin/com.brave.Browser"),
+            Path.home() / ".local" / "share" /
+            "flatpak" / "exports" / "bin" / "com.brave.Browser",
+        ])
+
+        # Vivaldi paths
+        paths.extend([
+            Path("/usr/bin/vivaldi"),
+            Path("/usr/bin/vivaldi-stable"),
+            Path("/opt/vivaldi/vivaldi"),
+            Path("/snap/bin/vivaldi"),
+        ])
+
+        # Opera paths
+        paths.extend([
+            Path("/usr/bin/opera"),
+            Path("/usr/bin/opera-stable"),
+            Path("/snap/bin/opera"),
         ])
 
     return paths

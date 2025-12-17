@@ -166,36 +166,6 @@ class TestOpenPWA:
             with pytest.raises(ChromiumNotFoundError):
                 open_pwa("https://example.com")
 
-    def test_respects_allow_system(self):
-        """Test that allow_system parameter is passed through."""
-        mock_chrome = Path("/usr/bin/chrome")
-
-        with patch('pwa_launcher.open_pwa.get_chromium_install', return_value=mock_chrome) as mock_get:
-            with patch('subprocess.Popen') as mock_popen:
-                mock_process = Mock()
-                mock_popen.return_value = mock_process
-
-                open_pwa("https://example.com", allow_system=False)
-
-                # Check that allow_system was passed
-                mock_get.assert_called_once()
-                assert mock_get.call_args[1]['allow_system'] is False
-
-    def test_respects_allow_download(self):
-        """Test that allow_download parameter is passed through."""
-        mock_chrome = Path("/usr/bin/chrome")
-
-        with patch('pwa_launcher.open_pwa.get_chromium_install', return_value=mock_chrome) as mock_get:
-            with patch('subprocess.Popen') as mock_popen:
-                mock_process = Mock()
-                mock_popen.return_value = mock_process
-
-                open_pwa("https://example.com", allow_download=False)
-
-                # Check that allow_download was passed
-                mock_get.assert_called_once()
-                assert mock_get.call_args[1]['allow_download'] is False
-
     def test_auto_profile_enabled(self):
         """Test that auto_profile generates isolated profile directory."""
         mock_chrome = Path("/usr/bin/chrome")

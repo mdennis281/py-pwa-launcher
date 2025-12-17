@@ -4,23 +4,34 @@
 
 Launch Progressive Web Apps from Python
 
-A Python library for launching Progressive Web Apps (PWAs) using Chromium-based browsers. Automatically finds or downloads a Chromium browser and launches PWAs in app mode with all necessary flags.
+A Python library for launching Progressive Web Apps (PWAs) using Chromium-based browsers. Automatically detects installed Chromium browsers and launches PWAs in app mode with all necessary flags.
 
 ## Features
 
 - 🚀 **Launch PWAs with a single function call**
-- 🔍 **Auto-detect** system Chrome/Edge browsers
-- 📥 **Auto-download** portable Chromium if needed
+- 🔍 **Auto-detect** system Chromium-based browsers (Chrome, Edge, Brave, Vivaldi, Opera, Arc)
 - ⚙️ **PWA-optimized flags** for installation and features
 - 🔒 **Custom profiles** for isolated PWA data
 - ✅ **Check PWA support** before launching
 - 🧪 **Fully tested** with comprehensive test suite
+- 🌍 **Cross-platform** support (Windows, macOS, Linux)
 
 ## Installation
 
 ```bash
 pip install pwa-launcher
 ```
+
+**Requirements**: You need a Chromium-based browser installed on your system:
+- Google Chrome
+- Microsoft Edge
+- Brave
+- Vivaldi
+- Opera
+- Arc (macOS)
+- Chromium
+
+The library will automatically detect any of these browsers.
 
 ## Quick Start
 
@@ -92,10 +103,7 @@ Launch a PWA using Chromium browser.
 
 **Parameters:**
 - `url` (str): URL to open as PWA (required)
-- `chromium_path` (Path, optional): Path to Chromium executable
-- `allow_system` (bool, default=True): Allow using system Chrome/Edge
-- `allow_download` (bool, default=True): Allow downloading portable Chromium
-- `install_dir` (Path, optional): Directory for portable Chromium
+- `chromium_path` (Path, optional): Path to Chromium executable (auto-detected if None)
 - `user_data_dir` (Path, optional): Custom browser profile directory
 - `additional_flags` (List[str], optional): Extra Chromium flags
 - `wait` (bool, default=False): Wait for browser to exit
@@ -128,28 +136,17 @@ Check if a URL supports PWA features.
 - `errors` (list): List of error messages
 - `warnings` (list): List of warnings
 
-### `get_chromium_install(**options)`
+### `get_chromium_install()`
 
-Get a single Chromium browser executable path (tries system → portable → download).
-
-**Parameters:**
-- `allow_system` (bool, default=True): Search for system Chrome/Edge
-- `allow_download` (bool, default=True): Allow downloading portable Chrome
-- `install_dir` (Path, optional): Directory for portable Chrome
-- `force_reinstall` (bool, default=False): Force download even if exists
+Get a Chromium browser executable path from system-installed browsers.
 
 **Returns:** `Path` - Path to Chromium executable
 
 **Raises:** `ChromiumNotFoundError` - No browser found
 
-### `get_chromium_installs(**options)`
+### `get_chromium_installs()`
 
-Get all available Chromium browser executable paths.
-
-**Parameters:**
-- `allow_system` (bool, default=True): Search for system Chrome/Edge
-- `allow_download` (bool, default=True): Allow downloading portable Chrome
-- `install_dir` (Path, optional): Directory for portable Chrome
+Get all available Chromium browser executable paths from system.
 
 **Returns:** `List[Path]` - List of paths to Chromium executables
 
@@ -175,7 +172,7 @@ python -m pwa_launcher.pwa_support https://weatherlite.app
 
 ## How It Works
 
-1. **Get Chromium**: Finds system Chrome/Edge or downloads portable Chromium
+1. **Detect Browser**: Searches for installed Chromium-based browsers on your system
 2. **Build Command**: Creates command with `--app={url}` and PWA flags
 3. **Launch**: Starts browser in app mode with PWA features enabled
 
@@ -188,6 +185,8 @@ python -m pwa_launcher.pwa_support https://weatherlite.app
 - `--enable-features=NotificationTriggers`: Enable notifications
 - `--no-default-browser-check`: Skip default browser check
 - `--no-first-run`: Skip first run experience
+- `--disable-infobars`: Remove automation banners
+- **Linux only**: `--no-sandbox`, `--disable-gpu`, `--disable-dev-shm-usage`
 
 ## Development
 

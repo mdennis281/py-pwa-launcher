@@ -18,9 +18,6 @@ logger = logging.getLogger(__name__)
 def open_pwa(
     url: str,
     chromium_path: Optional[Path] = None,
-    allow_system: bool = True,
-    allow_download: bool = True,
-    install_dir: Optional[Path] = None,
     user_data_dir: Optional[Path] = None,
     additional_flags: Optional[List[str]] = None,
     wait: bool = False,
@@ -35,9 +32,6 @@ def open_pwa(
     Args:
         url: URL to open as PWA
         chromium_path: Path to Chromium executable (auto-detected if None)
-        allow_system: Allow using system Chrome/Edge
-        allow_download: Allow downloading portable Chromium if needed
-        install_dir: Directory for portable Chromium installation
         user_data_dir: Custom user data directory for browser profile
         additional_flags: Additional Chromium flags
         wait: Wait for the browser process to exit
@@ -71,11 +65,7 @@ def open_pwa(
     # Get Chromium executable if not provided
     if chromium_path is None:
         logger.debug("Auto-detecting Chromium browser...")
-        chromium_path = get_chromium_install(
-            allow_system=allow_system,
-            allow_download=allow_download,
-            install_dir=install_dir,
-        )
+        chromium_path = get_chromium_install()
 
     logger.info("Using Chromium: %s", chromium_path)
 

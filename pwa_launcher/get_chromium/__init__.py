@@ -32,11 +32,11 @@ def get_chromium_install() -> Path:
         system_chrome = find_system_chromium()
         logger.debug("Found system-installed browser: %s", system_chrome)
         return system_chrome
-    except FileNotFoundError:
+    except FileNotFoundError as exc:
         logger.error("No Chromium browser found on system")
         raise ChromiumNotFoundError(
             "No Chromium browser found. Please install Chrome, Edge, Brave, Vivaldi, or another Chromium-based browser."
-        )
+        ) from exc
 
 
 def get_chromium_installs() -> List[Path]:

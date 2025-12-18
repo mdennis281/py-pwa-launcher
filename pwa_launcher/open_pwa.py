@@ -3,6 +3,7 @@ Open PWA - Launch a Progressive Web App using Chromium.
 """
 import hashlib
 import logging
+import platform
 import tempfile
 import subprocess
 from pathlib import Path
@@ -101,7 +102,6 @@ def open_pwa(
     ]
 
     # Add Linux-specific flags
-    import platform
     if platform.system() == 'Linux':
         pwa_flags.extend([
             '--no-sandbox',  # Required for running in restricted environments
@@ -147,8 +147,6 @@ def open_pwa(
     # Launch the browser
     try:
         # On Linux/macOS, we need to allow the process to run independently
-        import platform
-
         if platform.system() in ('Linux', 'Darwin'):
             # On Linux, temporarily capture stderr to check for dependency errors
             if platform.system() == 'Linux':

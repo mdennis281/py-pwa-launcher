@@ -2,7 +2,7 @@
 Tests for the PWA support checker module.
 """
 import json
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import pytest
 import urllib.error
 

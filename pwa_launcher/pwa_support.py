@@ -7,7 +7,6 @@ import re
 import urllib.request
 import urllib.error
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Optional, List, Dict, Any
 from urllib.parse import urljoin, urlparse
 
@@ -35,8 +34,8 @@ class PWACheckResult:
         parts = [
             f"PWA Check Results for: {self.url}",
             f"Status: {status}",
-            f"",
-            f"Requirements:",
+            "",
+            "Requirements:",
             f"  HTTPS: {'✓' if self.has_https else '✗'}",
             f"  Web Manifest: {'✓' if self.has_manifest else '✗'}",
             f"  Service Worker: {'✓' if self.has_service_worker else '✗'}",
@@ -54,12 +53,12 @@ class PWACheckResult:
             parts.append(f"\nService Worker URL: {self.service_worker_url}")
 
         if self.errors:
-            parts.append(f"\nErrors:")
+            parts.append("\nErrors:")
             for error in self.errors:
                 parts.append(f"  - {error}")
 
         if self.warnings:
-            parts.append(f"\nWarnings:")
+            parts.append("\nWarnings:")
             for warning in self.warnings:
                 parts.append(f"  - {warning}")
 
@@ -177,7 +176,7 @@ def fetch_manifest(manifest_url: str) -> Optional[Dict[str, Any]]:
     except json.JSONDecodeError as e:
         logger.warning("Failed to parse manifest JSON: %s", e)
         return None
-    except Exception as e:
+    except (urllib.error.URLError, urllib.error.HTTPError, OSError) as e:
         logger.warning("Failed to fetch manifest: %s", e)
         return None
 
@@ -235,7 +234,7 @@ def check_service_worker(html_content: str, base_url: str) -> tuple[bool, Option
                 logger.info(
                     "Found service worker registration in external script %s: %s", script_url, sw_url)
                 return True, sw_url
-        except Exception as e:
+        except (urllib.error.URLError, urllib.error.HTTPError, OSError) as e:
             logger.debug(
                 "Failed to fetch external script %s: %s", script_url, e)
             continue
@@ -254,12 +253,12 @@ def check_service_worker(html_content: str, base_url: str) -> tuple[bool, Option
         sw_url = urljoin(base_url, sw_path)
         try:
             # Try to fetch the file
-            content, headers = fetch_url(sw_url, timeout=5)
+            content, _ = fetch_url(sw_url, timeout=5)
             # Check if it looks like a service worker (contains common SW API calls)
             if any(keyword in content for keyword in ['self.addEventListener', 'caches.open', 'fetch(', 'ServiceWorkerGlobalScope']):
                 logger.info("Found service worker at common path: %s", sw_url)
                 return True, sw_url
-        except Exception:
+        except (urllib.error.URLError, urllib.error.HTTPError, OSError):
             continue
 
     logger.debug("No service worker found")
@@ -346,7 +345,7 @@ def check_pwa_support(url: str, timeout: int = 10) -> PWACheckResult:
 
     # Fetch the page
     try:
-        html_content, headers = fetch_url(url, timeout=timeout)
+        html_content, _ = fetch_url(url, timeout=timeout)
     except urllib.error.HTTPError as e:
         error_msg = f"HTTP error {e.code}: {e.reason}"
         logger.error("Failed to fetch URL: %s", error_msg)
@@ -357,7 +356,7 @@ def check_pwa_support(url: str, timeout: int = 10) -> PWACheckResult:
         logger.error("Failed to fetch URL: %s", error_msg)
         result.errors.append(error_msg)
         return result
-    except Exception as e:
+    except OSError as e:
         error_msg = f"Failed to fetch URL: {e}"
         logger.error("Unexpected error: %s", error_msg)
         result.errors.append(error_msg)
@@ -405,7 +404,7 @@ def check_pwa_support(url: str, timeout: int = 10) -> PWACheckResult:
 
 
 if __name__ == "__main__":
-    """Test the PWA checker."""
+    # Test the PWA checker
     import sys
 
     # Configure logging
@@ -419,5 +418,5 @@ if __name__ == "__main__":
 
     print(f"Checking PWA support for: {test_url}\n")
 
-    result = check_pwa_support(test_url)
-    print(result)
+    check_result = check_pwa_support(test_url)
+    print(check_result)

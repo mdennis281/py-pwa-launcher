@@ -1,7 +1,6 @@
 """
 Tests for the get_chromium module.
 """
-from pathlib import Path
 from unittest.mock import patch
 import pytest
 
@@ -76,30 +75,6 @@ class TestChromiumNotFoundError:
             raise ChromiumNotFoundError("Test error")
 
         assert "Test error" in str(exc_info.value)
-
-    @patch('pwa_launcher.get_chromium.find_system_chromiums')
-    def test_returns_empty_when_none_found(self, mock_find_systems):
-        """Test that empty list is returned when no browsers found."""
-        mock_find_systems.return_value = []
-
-        result = get_chromium_installs()
-
-        assert result == []
-
-
-class TestChromiumNotFoundError:
-    """Tests for ChromiumNotFoundError exception."""
-
-    def test_is_exception(self):
-        """Test that ChromiumNotFoundError is an Exception."""
-        assert issubclass(ChromiumNotFoundError, Exception)
-
-    def test_can_be_raised_and_caught(self):
-        """Test that ChromiumNotFoundError can be raised and caught."""
-        with pytest.raises(ChromiumNotFoundError) as exc_info:
-            raise ChromiumNotFoundError("Test message")
-
-        assert "Test message" in str(exc_info.value)
 
 
 if __name__ == "__main__":

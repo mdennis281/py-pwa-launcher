@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Optional, List
 from urllib.parse import urlparse
 
-from pwa_launcher.get_chromium import get_chromium_install, ChromiumNotFoundError
+from pwa_launcher.get_chromium import get_chromium_install
 
 
 logger = logging.getLogger(__name__)

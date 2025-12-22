@@ -181,8 +181,7 @@ def open_pwa(
                             "sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2")
                         raise RuntimeError(
                             "Chrome failed to start due to missing system libraries. "
-                            "Install dependencies with: sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2"
-                        )
+                            "Install dependencies with: sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2")
                     else:
                         raise RuntimeError(
                             f"Chrome failed to start on Linux (exit code: {poll_result}). Check logs for details.")
@@ -220,4 +219,3 @@ def open_pwa(
     except Exception as e:
         logger.error("Failed to launch browser: %s", e)
         raise
-

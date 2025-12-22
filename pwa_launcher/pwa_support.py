@@ -232,7 +232,9 @@ def check_service_worker(html_content: str, base_url: str) -> tuple[bool, Option
                 # Resolve relative to the script's URL
                 sw_url = urljoin(script_url, sw_path)
                 logger.info(
-                    "Found service worker registration in external script %s: %s", script_url, sw_url)
+                    "Found service worker registration in external script %s: %s",
+                    script_url,
+                    sw_url)
                 return True, sw_url
         except (urllib.error.URLError, urllib.error.HTTPError, OSError) as e:
             logger.debug(
@@ -255,7 +257,12 @@ def check_service_worker(html_content: str, base_url: str) -> tuple[bool, Option
             # Try to fetch the file
             content, _ = fetch_url(sw_url, timeout=5)
             # Check if it looks like a service worker (contains common SW API calls)
-            if any(keyword in content for keyword in ['self.addEventListener', 'caches.open', 'fetch(', 'ServiceWorkerGlobalScope']):
+            if any(
+                keyword in content for keyword in [
+                    'self.addEventListener',
+                    'caches.open',
+                    'fetch(',
+                    'ServiceWorkerGlobalScope']):
                 logger.info("Found service worker at common path: %s", sw_url)
                 return True, sw_url
         except (urllib.error.URLError, urllib.error.HTTPError, OSError):

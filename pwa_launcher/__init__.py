@@ -1,6 +1,6 @@
 
-from pwa_launcher.get_chromium import ( 
-    get_chromium_install, 
+from pwa_launcher.get_chromium import (
+    get_chromium_install,
     get_chromium_installs,
     ChromiumNotFoundError
 )

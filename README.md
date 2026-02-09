@@ -110,7 +110,7 @@ Launch a PWA using Chromium browser.
 - `user_data_dir` (Path, optional): Custom browser profile directory
 - `additional_flags` (List[str], optional): Extra Chromium flags
 - `wait` (bool, default=False): Wait for browser to exit
-- `auto_profile` (bool, default=True): Auto-generate isolated profile (keeps process alive)
+- `auto_profile` (bool, default=False): Auto-generate isolated profile (keeps process alive)
 
 **Returns:** `subprocess.Popen` - Browser process
 

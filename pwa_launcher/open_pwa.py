@@ -22,7 +22,7 @@ def open_pwa(
     user_data_dir: Optional[Path] = None,
     additional_flags: Optional[List[str]] = None,
     wait: bool = False,
-    auto_profile: bool = True,
+    auto_profile: bool = False,
 ) -> subprocess.Popen:
     """
     Open a URL as a Progressive Web App using Chromium.

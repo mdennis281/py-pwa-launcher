@@ -151,7 +151,7 @@ def find_manifest_url(html_content: str, base_url: str) -> Optional[str]:
     if match:
         manifest_href = match.group(1)
         manifest_url = urljoin(base_url, manifest_href)
-        logger.info("Found manifest URL: %s", manifest_url)
+        logger.debug("Found manifest URL: %s", manifest_url)
         return manifest_url
 
     logger.debug("No manifest found in HTML")
@@ -171,7 +171,7 @@ def fetch_manifest(manifest_url: str) -> Optional[Dict[str, Any]]:
     try:
         content, _ = fetch_url(manifest_url)
         manifest_data = json.loads(content)
-        logger.info("Successfully parsed manifest")
+        logger.debug("Successfully parsed manifest")
         return manifest_data
     except json.JSONDecodeError as e:
         logger.warning("Failed to parse manifest JSON: %s", e)
@@ -210,7 +210,7 @@ def check_service_worker(html_content: str, base_url: str) -> tuple[bool, Option
         if match:
             sw_path = match.group(1)
             sw_url = urljoin(base_url, sw_path)
-            logger.info(
+            logger.debug(
                 "Found service worker registration in inline script: %s", sw_url)
             return True, sw_url
 
@@ -231,7 +231,7 @@ def check_service_worker(html_content: str, base_url: str) -> tuple[bool, Option
                 sw_path = match.group(1)
                 # Resolve relative to the script's URL
                 sw_url = urljoin(script_url, sw_path)
-                logger.info(
+                logger.debug(
                     "Found service worker registration in external script %s: %s",
                     script_url,
                     sw_url)
@@ -263,7 +263,7 @@ def check_service_worker(html_content: str, base_url: str) -> tuple[bool, Option
                     'caches.open',
                     'fetch(',
                     'ServiceWorkerGlobalScope']):
-                logger.info("Found service worker at common path: %s", sw_url)
+                logger.debug("Found service worker at common path: %s", sw_url)
                 return True, sw_url
         except (urllib.error.URLError, urllib.error.HTTPError, OSError):
             continue

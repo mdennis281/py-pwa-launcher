@@ -104,7 +104,7 @@ def open_pwa(
     # Add Linux-specific flags
     if platform.system() == 'Linux':
         pwa_flags.extend([
-            '--no-sandbox',  # Required for running in restricted environments
+            #'--no-sandbox',  # Required for running in restricted environments
             # Disable GPU hardware acceleration (can cause issues)
             '--disable-gpu',
             '--disable-dev-shm-usage',  # Overcome limited resource problems

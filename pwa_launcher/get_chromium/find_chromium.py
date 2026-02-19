@@ -47,7 +47,6 @@ def find_system_chromium() -> Path:
             logger.debug("Found Chromium at: %s", path)
             return path
 
-    logger.error("No Chromium-based browser found on system")
     raise FileNotFoundError(
         "No system Chromium browser found (Chrome or Edge)")
 
